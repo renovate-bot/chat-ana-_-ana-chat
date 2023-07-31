@@ -1,0 +1,27 @@
+{
+    "name": "ana-chat",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "npm run build && concurrently --names \"next, shuttle\" --kill-others \"next dev\" \"cargo shuttle run --working-directory ./backend/\"",
+        "build": "next build && next export -o ./backend/static && cargo build --manifest-path ./backend/Cargo.toml",
+        "start": "cargo shuttle project start --working-directory ./backend/",
+        "lint": "next lint",
+        "shuttle-login": "cargo shuttle login --working-directory ./backend/",
+        "deploy": "npm run build && cargo shuttle deploy --working-directory ./backend/ --allow-dirty",
+        "stop": "cargo shuttle project stop --working-directory ./backend/"
+    },
+    "dependencies": {
+        "@next/font": "13.4.12",
+        "@types/node": "20.4.5",
+        "@types/react": "18.2.17",
+        "@types/react-dom": "18.2.7",
+        "next": "13.4.12",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "typescript": "5.1.6"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.0"
+    }
+}
