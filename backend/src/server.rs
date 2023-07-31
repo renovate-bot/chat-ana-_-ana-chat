@@ -1,5 +1,5 @@
 use crate::{common::DuplicateChecker, user::User, msg::Chat};
-use mongodb::{Collection, error, bson::doc};
+use mongodb::{error, bson::doc, Database};
 use async_trait::async_trait;
 
 struct Server {
@@ -15,11 +15,11 @@ struct Channel {
 }
 
 impl Server {
-    fn new(name: String, member: Vec<User>, channels: Vec<Channel>) -> Self {
+    fn new(name: String, member: Option<Vec<User>>, channels: Option<Vec<Channel>>) -> Self {
         Self {
             name,
-            member,
-            channels
+            member: member.unwrap_or(Vec::new()),
+            channels: channels.unwrap_or(Vec::new())
         }
     }
 }
@@ -36,11 +36,8 @@ impl Channel {
 
 #[async_trait]
 impl DuplicateChecker for Server {
-    async fn is_duplicate<T>(&self, collec: Collection<T>) -> error::Result<bool>
-    where
-        T: Send + Sync + Unpin + 'static,
-    {
-        let data = collec
+    async fn is_duplicate(&self, db: &Database) -> error::Result<bool>{
+        let data = db.collection::<Server>("servers")
             .count_documents(doc! {
                 "name": &self.name
             }, None)
@@ -55,14 +52,11 @@ impl DuplicateChecker for Server {
 
 #[async_trait]
 impl DuplicateChecker for Channel {
-    async fn is_duplicate<T>(&self, collec: Collection<T>) -> error::Result<bool>
-    where
-        T: Send + Sync + Unpin + 'static,
-    {
-        let data = collec
+    async fn is_duplicate(&self, db: &Database) -> error::Result<bool> {
+        let data = db.collection::<Channel>("channels")
             .count_documents(doc! {
-                "name": self.name.clone(),
-                "server": self.parent_server_name.clone()
+                "name": &self.name,
+                "server": &self.parent_server_name
             }, None)
             .await?;
         if data > 0 {

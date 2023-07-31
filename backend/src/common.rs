@@ -1,9 +1,7 @@
-use mongodb::{Collection, error};
+use mongodb::{Database, error};
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait DuplicateChecker: Send {
-    async fn is_duplicate<T>(&self, collec: Collection<T>) -> error::Result<bool>
-    where
-        T: Send + Sync + Unpin + 'static;
+    async fn is_duplicate(&self, db: &Database) -> error::Result<bool>;
 }
