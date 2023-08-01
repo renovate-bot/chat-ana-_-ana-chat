@@ -14,6 +14,8 @@
     --dom: #fff;
     
     --primary: #2760ff;
+
+    --bounce: cubic-bezier(0.18, 0.24, 0.09, 1.16);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,9 +50,9 @@ nav{
     margin: 10px;
     height: 98vh;
     background-color: var(--dom);
-    transition: all .2s;
+    transition: all .3s;
     transform: translateX(-95px);
-
+    transition-timing-function: var(--bounce);
     &:hover, &.true{
         transform: translateX(0px);
     }
@@ -67,7 +69,7 @@ a.serverBtn{
     background-color: var(--primary);
     cursor: pointer;
     transition: all 1s;
-    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition-timing-function: var(--bounce);
     
     border-radius: 35px;
     
@@ -140,6 +142,16 @@ main{
         color: var(--reverse);
         padding: 5px;
         cursor: pointer;
+        transition: all .3s;
+        transition-timing-function: var(--bounce);
+
+        &:hover{
+            filter: brightness(0.9);
+        }
+        &:active{
+            filter: brightness(0.8);
+            transform: scale(0.9);
+        }
     }
 }
 
@@ -156,8 +168,9 @@ aside{
     margin: 10px;
     height: 98vh;
     background-color: var(--dom);
-    transition: all .2s;
-    transform: translateX(110%);
+    transition: all .4s;
+    transform: translateX(310px);
+    transition-timing-function: var(--bounce);
 
     &:hover, &.true{
         transform: translateX(0px);

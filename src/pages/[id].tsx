@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
-import { useEffect, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,11 +13,17 @@ export default function Home() {
   useEffect( () => {
     document.addEventListener("mousemove", (e) => {
       dom_s(e.clientX <= 15)
-      // console.log(window.innerWidth - e.clientX <= 30)
-      // console.log(e.clientX)
       members_s(window.innerWidth - e.clientX <= 10)
     })
   })
+  const sendMessage = (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+
+    if (message.current?.value){
+      console.log(message.current?.value)
+      message.current.value = "";
+    }
+  }
   return (
     <div id="main">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -40,14 +46,9 @@ export default function Home() {
         <section>메세지1</section>
       </main>
         
-      <form id='messageSender' onSubmit={e => {e.preventDefault}}>
+      <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
           <input type="text" ref={message} placeholder='메세지를 입력해주세요' />
-          <img src="/icon/send_w.svg" onClick={() => {
-            if (message.current?.value){
-              console.log(message.current?.value)
-              message.current.value = "";
-            }
-          }}/>
+          <img src="/icon/send_w.svg" onClick={() => sendMessage()}/>
       </form>
 
       <aside className={String(members_v)}>
