@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use axum::http::HeaderMap;
+use axum::http::{HeaderMap, StatusCode};
 use mongodb::{bson::doc, error, Database};
 use crate::common::DuplicateChecker;
 use serde::{Deserialize, Serialize};
@@ -50,15 +50,13 @@ impl User {
 }
 
 pub struct UserEndpoint {
-    db: Database,
-    runtime: tokio::runtime::Runtime
+    db: Database
 }
 
 impl UserEndpoint {
     pub fn new(db: Database) -> Self {
         Self {
-            db,
-            runtime: tokio::runtime::Runtime::new().unwrap()
+            db
         }
     }
 
@@ -71,13 +69,27 @@ impl UserEndpoint {
         }
         Ok(user)
     }
+}
 
-    pub fn login_end(&self, header: HeaderMap) -> error::Result<User> {
-        let name = header.get("name").unwrap().to_str().unwrap().to_string();
-        let email = header.get("email").unwrap().to_str().unwrap().to_string();
-        let profile_image = header.get("profile_image").unwrap().to_str().unwrap().to_string();
-        let user_endpoint = UserEndpoint::new(self.db.clone());
-        let user = self.runtime.block_on(user_endpoint.login(name, email, profile_image))?;
-        Ok(user)
+pub async fn login_end(header: HeaderMap) -> String {
+    let name = header.get("name").unwrap().to_str().unwrap().to_string();
+    let email = header.get("email").unwrap().to_str().unwrap().to_string();
+    let profile_image = header.get("profile_image").unwrap().to_str().unwrap().to_string();
+    let db = crate::common::get_db().await;
+    let userendpoint = UserEndpoint::new(db);
+    let user = userendpoint.login(name, email, profile_image).await.unwrap();
+    serde_json::to_string(&user).unwrap()
+}
+
+pub async fn get_user_info(header: HeaderMap) -> Result<String, axum::http::StatusCode> {
+    let email = header.get("email").unwrap().to_str().unwrap().to_string();
+    let db = crate::common::get_db().await;
+    let collec = db.collection::<User>("users");
+    let user = collec.find_one(doc! {
+        "email": email
+    }, None).await.unwrap();
+    match user {
+        None => return Err(StatusCode::NOT_FOUND),
+        Some(a) => Ok(serde_json::to_string(&a).unwrap())
     }
 }
