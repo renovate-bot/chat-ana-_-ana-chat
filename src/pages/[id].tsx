@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,14 +30,14 @@ export default function Home() {
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
 
       <nav className={String(dom_v)}>
-        <ServerBtn url="/logo.svg" select={true}/>
+        <ServerBtn id="logo" select={true}/>
         
         <hr/>
-        <ServerBtn url="/server/ea.png"/>
-        <ServerBtn url="/server/ea.png"/>
-        <ServerBtn url="/server/ea.png"/>
-        <ServerBtn url="/server/ea.png"/>
-        <ServerBtn url="/server/ea.png"/>
+        <ServerBtn id="1"/>
+        <ServerBtn id="2"/>
+        <ServerBtn id="3"/>
+        <ServerBtn id="4"/>
+        <ServerBtn id="5"/>
       </nav>
 
       <main>
@@ -52,30 +53,37 @@ export default function Home() {
       </form>
 
       <aside className={String(members_v)}>
-        <UserInfo id='eaaaaaaaaaaaaaaaaaaa1' url="/server/ea.png"/>
-        <UserInfo id='eaaa2' url="/server/ea.png"/>
-        <UserInfo id='eaaa3' url="/server/ea.png"/>
-        <UserInfo id='eaaa4' url="/server/ea.png"/>
-        <UserInfo id='eaaa5' url="/server/ea.png"/>
+        <UserInfo id='1' name="eaaaaaaaaaaaaaaaa" url="/server/ea.png"/>
+        <UserInfo id='1' name="eee" url="ea"/>
+        <UserInfo id='1' name="s" url="ea"/>
+        <UserInfo id='1' name="ddf" url="ea"/>
+        <UserInfo id='1' name="5-23" url="ea"/>
       </aside>
     </div>
   )
 }
 
-function ServerBtn(props: {url: string, select?: boolean}){
-  // console.log(props.select)
+function ServerBtn(props: {id: string, select?: boolean}){
+  console.log(`/server/${props.id}.png`)
+  if (props.id == "logo") {
+    return (
+      <Link href={`/${props.id}`} className={`serverBtn ${props.select}`}>
+        <img src={`/logo.svg`}/>
+      </Link>
+    )
+  }
   return (
-    <a className={`serverBtn ${props.select}`}>
-      <img src={props.url}/>
-    </a>
+    <Link href={`/${props.id}`} className={`serverBtn ${props.select}`}>
+      <img src={`/server/${props.id}.png`}/>
+    </Link>
   )
 }
 
-function UserInfo(props: {url: string, id: string}){
+function UserInfo(props: {url: string, id: string, name: string}){
   // console.log(props.select)
   return (
     <a className={`userInfo`}>
-      <img src={props.url}/> <b>{props.id}</b>
+      <img src={`/user/${props.id}.png`}/> <b>{props.name}</b>
       <span></span>
     </a>
   )
