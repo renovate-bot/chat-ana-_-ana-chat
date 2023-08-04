@@ -19,7 +19,12 @@ async fn axum(
     let router =
         Router::new().merge(SpaRouter::new("/", static_folder).index_file("index.html"))
         .route("/user/login", post(user::login_end))
-        .route("/user/info", get(user::get_user_info));
+        .route("/user/info", get(user::get_user_info))
+        .route("/server/create", post(server::create_server))
+        .route("/server/join", post(server::join_server))
+        .route("/server/info", get(server::info_server))
+        .route("/chat/send", post(msg::send_chat))
+        .route("/chat/info", get(msg::info_chat));
 
     Ok(router.into())
 }
