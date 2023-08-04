@@ -3,3 +3,4 @@
 **/target/
 static/
 mongodb_url
+Secrets.toml

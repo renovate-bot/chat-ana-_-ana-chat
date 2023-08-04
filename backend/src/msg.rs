@@ -43,9 +43,7 @@ pub async fn send_chat(header: HeaderMap) -> String {
         "name": name
     }, doc! {
         "$set": {
-            "message": serv.message.into_iter().map(|x| {
-                std::str::from_utf8(&x.bytes()).unwrap().to_string()
-            }).collect::<Vec<String>>()
+            "message": serv.message.into_iter().collect::<Vec<Uuid>>()
         }
     }, None)
     .await
