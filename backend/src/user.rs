@@ -87,9 +87,9 @@ impl UserEndpoint {
     }
 }
 
-pub async fn login_end(header: HeaderMap) -> Result<String, StatusCode> {
+pub async fn create_user(header: HeaderMap) -> Result<String, StatusCode> {
     let name = get_header_string(&header, "name")?;
-    let email = get_header_string(&header, "email")?;
+    let email = get_header_string(&header, "email")?;   
     let profile_image = get_header_string(&header, "profile_image")?;
     let db = crate::common::get_db().await;
     let userendpoint = UserEndpoint::new(db);

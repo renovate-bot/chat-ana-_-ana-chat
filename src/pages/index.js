@@ -11,7 +11,7 @@ export default function Home() {
   const [dom_v, dom_s] = useState(false);
   const [members_v, members_s] = useState(false);
   const {id} =  useRouter().query;
-  console.log(id)
+  // console.log(id)
   let message = useRef(null);
   useEffect( () => {
     document.addEventListener("mousemove", (e) => {
@@ -23,24 +23,54 @@ export default function Home() {
     e?.preventDefault();
 
     if (message.current?.value){
-      let a = fetch("http://127.0.0.1:8000/chat/send", {
+      fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
           "chatid": "a",
           "chat": {
             "_id": "0",
-            "sender": "a",
+            "sender": "523",
             "content": "asdf",
             "date": new Date().getTime()
           }
         }
-      }).then(e => { console.log(e.json()) })
+      }).then(e => { console.log(e) })
 
-      let b = fetch("http://127.0.0.1:8000/chat/info", {
+      // fetch("http://127.0.0.1:8000/user/create", {
+      //   method: "POST",
+      //   headers: {
+      //     "name": "523",
+      //     "email": "yhanbyeol6@gmail.com",
+      //     "profile_image": "a",
+      //   }
+      // }).then(e => { console.log(e) })
+
+
+
+      // fetch("http://127.0.0.1:8000/user/info", {
+      //   method: "GET",
+      //   headers: {
+      //     "name": "523",
+      //     "email": "yhanbyeol6@gmail.com",
+      //     "profile_image": "a",
+      //   }
+      // }).then(e => { console.log(e) })
+
+      //server info
+      fetch("http://127.0.0.1:8000/server/info", {
         headers: {
           "name": "a"
         }
-      }).then( e => { console.log(e) })
+      }).then( e => { e.json().then(e => {
+        console.log(e)
+      }) })
+      // fetch("http://127.0.0.1:8000/server/create", {
+      //   method: "POST",
+      //   headers: {
+      //     "name": "a"
+      //   }
+      // }).then( e => { console.log(e) })
+
       message.current.value = "";
     } else { console.log("non") } 
   }
@@ -60,10 +90,7 @@ export default function Home() {
       </nav>
 
       <main>
-        <section>메세지4</section>
-        <section>메세지3</section>
-        <section>메세지2</section>
-        <section>메세지1</section>
+        <Msg name="5-23" msg="asdf"/>
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -103,5 +130,12 @@ function UserInfo(props){
       <img src={`/user/${props.id}.png`}/> <b>{props.name}</b>
       <span></span>
     </a>
+  )
+}
+
+function Msg(props){
+  return (
+    <section>
+      <b>{props.name}</b>: {props.msg}</section>
   )
 }

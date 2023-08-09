@@ -18,7 +18,7 @@ async fn axum(
     set_var("MONGO_URI", uri);
     let router =
         Router::new().merge(SpaRouter::new("/", static_folder).index_file("index.html"))
-        .route("/user/login", post(user::login_end))
+        .route("/user/create", post(user::create_user))
         .route("/user/info", get(user::get_user_info))
         .route("/server/create", post(server::create_server))
         .route("/server/join", post(server::join_server))
