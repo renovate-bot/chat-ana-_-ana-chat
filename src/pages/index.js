@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,26 +8,22 @@ import { useRouter } from 'next/router'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [dom_v, dom_s] = useState<boolean>(false);
-  const [members_v, members_s] = useState<boolean>(false);
+  const [dom_v, dom_s] = useState(false);
+  const [members_v, members_s] = useState(false);
   const {id} =  useRouter().query;
   console.log(id)
-  let message = useRef<HTMLInputElement>(null);
+  let message = useRef(null);
   useEffect( () => {
     document.addEventListener("mousemove", (e) => {
       dom_s(e.clientX <= 15)
       members_s(window.innerWidth - e.clientX <= 10)
     })
   })
-  const sendMessage = (e?: FormEvent<HTMLFormElement>) => {
+  const sendMessage = (e) => {
     e?.preventDefault();
 
     if (message.current?.value){
-      // let header: HeadersInit = new MainHeader();
-      // let user: HeadersInit = new Headers();
-      // header.set('chatid', 'a');
-      // header.set('chat', user);
-      fetch("http://127.0.0.1:8080/chat/info", {
+      let a = fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
           "chatid": "a",
@@ -39,9 +34,15 @@ export default function Home() {
             "date": new Date().getTime()
           }
         }
-      })
+      }).then(e => { console.log(e.json()) })
+
+      let b = fetch("http://127.0.0.1:8000/chat/info", {
+        headers: {
+          "name": "a"
+        }
+      }).then( e => { console.log(e) })
       message.current.value = "";
-    }
+    } else { console.log("non") } 
   }
   return (
     <div id="main">
@@ -81,7 +82,7 @@ export default function Home() {
   )
 }
 
-function ServerBtn(props: {id: string, select?: boolean}){
+function ServerBtn(props){
   if (props.id == "logo") {
     return (
       <Link href={`?id=${props.id}`} className={`serverBtn ${props.select}`}>
@@ -96,7 +97,7 @@ function ServerBtn(props: {id: string, select?: boolean}){
   )
 }
 
-function UserInfo(props: {url: string, id: string, name: string}){
+function UserInfo(props){
   return (
     <a className={`userInfo`}>
       <img src={`/user/${props.id}.png`}/> <b>{props.name}</b>
