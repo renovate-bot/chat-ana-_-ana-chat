@@ -23,40 +23,44 @@ export default function Home() {
     e?.preventDefault();
 
     if (message.current?.value){
+      // console.log(new Date().getTime())
       fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
-          "chatid": "a",
-          "chat": {
-            "_id": "0",
-            "sender": "523",
-            "content": "asdf",
-            "date": new Date().getTime()
-          }
+          "sender": "524",
+          "content": "ㅁ",
+          "servername": "a"
         }
       }).then(e => { console.log(e) })
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
       //   headers: {
-      //     "name": "523",
-      //     "email": "yhanbyeol6@gmail.com",
+      //     "name": "524",
+      //     "email": "yhanbyeol6bg@gmail.com",
       //     "profile_image": "a",
       //   }
       // }).then(e => { console.log(e) })
 
 
+      fetch("http://127.0.0.1:8000/user/info", {
+        method: "GET",
+        headers: {
+          "email": "yhanbyeol6bg@gmail.com",
+        }
+      }).then(e => { console.log(e) })
 
-      // fetch("http://127.0.0.1:8000/user/info", {
-      //   method: "GET",
+
+
+      // fetch("http://127.0.0.1:8000/server/join", {
+      //   method: "POST",
       //   headers: {
-      //     "name": "523",
-      //     "email": "yhanbyeol6@gmail.com",
-      //     "profile_image": "a",
+      //     "servername": "a",
+      //     "username": "524",
       //   }
       // }).then(e => { console.log(e) })
 
-      //server info
+      // server info
       fetch("http://127.0.0.1:8000/server/info", {
         headers: {
           "name": "a"
@@ -64,6 +68,7 @@ export default function Home() {
       }).then( e => { e.json().then(e => {
         console.log(e)
       }) })
+
       // fetch("http://127.0.0.1:8000/server/create", {
       //   method: "POST",
       //   headers: {
