@@ -10,7 +10,7 @@ axum = "0.6.10"
 axum-extra = { version = "0.4.2", features = ["spa"] }
 chrono = "0.4.26"
 mongodb = "2.6.0"
-serde = "1.0.179"
+serde = "1.0.183"
 shuttle-axum = "0.21.0"
 shuttle-runtime = "0.21.0"
 shuttle-static-folder = "0.21.0"
