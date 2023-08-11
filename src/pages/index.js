@@ -11,24 +11,42 @@ export default function Home() {
   const [dom_v, dom_s] = useState(false);
   const [members_v, members_s] = useState(false);
   const {id} =  useRouter().query;
-  // console.log(id)
+  const [msg_v, msg_s] = useState([])
   let message = useRef(null);
   useEffect( () => {
     document.addEventListener("mousemove", (e) => {
       dom_s(e.clientX <= 15)
       members_s(window.innerWidth - e.clientX <= 10)
     })
-  })
+
+    if (new Date().getTime() % 4){
+      // server info
+      fetch("http://127.0.0.1:8000/server/info", {
+        headers: {
+          "name": id
+        }
+      }).then( e => { e.json().then(e => {
+        for (i in e.message){
+          // console.log(e.message[i])
+          
+          console.log(chatid(e.message[i]))
+        }
+        // console.log(a)
+        msg_s(e.message)
+
+      })
+    })
+  }})
+      
   const sendMessage = (e) => {
     e?.preventDefault();
 
     if (message.current?.value){
-      // console.log(new Date().getTime())
       fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
           "sender": "524",
-          "content": "ㅁ",
+          "content": encodeURI(message.current.value),
           "servername": "a"
         }
       }).then(e => { console.log(e) })
@@ -43,12 +61,12 @@ export default function Home() {
       // }).then(e => { console.log(e) })
 
 
-      fetch("http://127.0.0.1:8000/user/info", {
-        method: "GET",
-        headers: {
-          "email": "yhanbyeol6bg@gmail.com",
-        }
-      }).then(e => { console.log(e) })
+      // fetch("http://127.0.0.1:8000/user/info", {
+      //   method: "GET",
+      //   headers: {
+      //     "email": "yhanbyeol6bg@gmail.com",
+      //   }
+      // }).then(e => { console.log(e) })
 
 
 
@@ -59,15 +77,6 @@ export default function Home() {
       //     "username": "524",
       //   }
       // }).then(e => { console.log(e) })
-
-      // server info
-      fetch("http://127.0.0.1:8000/server/info", {
-        headers: {
-          "name": "a"
-        }
-      }).then( e => { e.json().then(e => {
-        console.log(e)
-      }) })
 
       // fetch("http://127.0.0.1:8000/server/create", {
       //   method: "POST",
@@ -95,7 +104,15 @@ export default function Home() {
       </nav>
 
       <main>
-        <Msg name="5-23" msg="asdf"/>
+        {/* {msg_v.map((e) => (
+            fetch("http://127.0.0.1:8000/chat/info", {
+              method: "GET",
+              headers: {
+                "chatid": e.message[i]
+              }
+            }).then(e => ( e.json().then(e => <Msg name="5-23" msg={ (e) }/>) ))
+          
+        ))} */}
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -143,4 +160,12 @@ function Msg(props){
     <section>
       <b>{props.name}</b>: {props.msg}</section>
   )
+}
+function chatid(id) {
+  fetch("http://127.0.0.1:8000/chat/info", {
+    method: "GET",
+    headers: {
+      "chatid": id
+    }
+  }).then(e => { e.json().then(e => { return e }) } )
 }
