@@ -23,6 +23,26 @@ impl Server {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+struct ServerForJSON {
+    name: String,
+    member: Vec<String>,
+    message: Vec<String>
+}
+
+impl ServerForJSON {
+    fn new(serv: Server) -> Self {
+        let mut a = Self {
+            name: serv.name,
+            member: serv.member.into_iter().collect::<Vec<String>>(),
+            message: serv.message.into_iter().map(|x| x.to_string()).collect()
+        };
+        a.member.sort();
+        a.message.sort();
+        a
+    }
+}
+
 #[async_trait]
 impl DuplicateChecker for Server {
     async fn is_duplicate(&self, db: &Database) -> Result<bool, StatusCode>{
@@ -99,7 +119,7 @@ pub async fn info_server(header: HeaderMap) -> Result<String, StatusCode> {
         .await
         .unwrap();
     match serv {
-        Some(s) => Ok(serde_json::to_string(&s).unwrap()),
+        Some(s) => Ok(serde_json::to_string(&ServerForJSON::new(s)).unwrap()),
         None => Err(StatusCode::NOT_FOUND)
     }
 }
