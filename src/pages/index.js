@@ -26,12 +26,7 @@ export default function Home() {
           "name": id
         }
       }).then( e => { e.json().then(e => {
-        for (i in e.message){
-          // console.log(e.message[i])
-          
-          console.log(chatid(e.message[i]))
-        }
-        // console.log(a)
+        // console.log(e.message)
         msg_s(e.message)
 
       })
@@ -104,15 +99,12 @@ export default function Home() {
       </nav>
 
       <main>
-        {/* {msg_v.map((e) => (
-            fetch("http://127.0.0.1:8000/chat/info", {
-              method: "GET",
-              headers: {
-                "chatid": e.message[i]
-              }
-            }).then(e => ( e.json().then(e => <Msg name="5-23" msg={ (e) }/>) ))
-          
-        ))} */}
+        {
+        msg_v.map( async (e) => 
+        {console.log(await chatid(msg_v[0]))}
+          // <p></p>
+        )
+        }
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -161,11 +153,12 @@ function Msg(props){
       <b>{props.name}</b>: {props.msg}</section>
   )
 }
-function chatid(id) {
-  fetch("http://127.0.0.1:8000/chat/info", {
+async function chatid(id) {
+  const a = await fetch("http://127.0.0.1:8000/chat/info", {
     method: "GET",
     headers: {
       "chatid": id
     }
-  }).then(e => { e.json().then(e => { return e }) } )
+  })
+  return await a.json()
 }
