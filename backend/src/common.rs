@@ -21,7 +21,6 @@ pub fn get_header_string(header: &HeaderMap, name: &str) -> Result<String, Statu
 }
 
 pub async fn get_db() -> Database{
-    println!("{}", var("MONGO_URI").unwrap());
     let mut client_options =
     ClientOptions::parse(var("MONGO_URI").expect("MONGO_URI not found"))
         .await.expect("option error");
