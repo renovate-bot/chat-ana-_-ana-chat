@@ -1,9 +1,12 @@
+"use client"
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+let cnt = 0;
+console.log("started")
 
 const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
@@ -14,7 +17,6 @@ export default function Home() {
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
   let arr = useRef([]);
-  let cnt = 0;
   useEffect( () => {
     
     document.addEventListener("mousemove", (e) => {
@@ -22,25 +24,30 @@ export default function Home() {
       members_s(window.innerWidth - e.clientX <= 10)
     })
     let f = async () => {
-      cnt += 1;
-      if (cnt%80 == 0){
-        console.log(cnt)
+      if (cnt % 80 == 0){
+        // console.log(id)
         // server info
         fetch("http://127.0.0.1:8000/server/info", {
           headers: {
-            "name": id
+            "name": "a"
           }
         }).then(e => { e.json().then(e => {
-          if (msg_v.length > arr.current.length){
+          if (cnt % 160 == 0){
             arr.current = []
           }
+          console.log(e)
           console.log(e.message.map( async e => {arr.current.push(await chatid(e)); return await chatid(e)} ), msg_s(arr.current), msg_v)
         })})
         
       }
+      cnt++
       requestAnimationFrame(f)
     }
-    window.onload = f
+    if (cnt == 0) {
+      cnt++
+      console.log("ok")
+      f()
+    }
   // if (!open){
   //   open = true
   // }
