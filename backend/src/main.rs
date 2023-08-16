@@ -2,7 +2,7 @@ use std::{env::set_var, path::PathBuf};
 
 use axum::{Router, routing::{get, post}, http::Method};
 use shuttle_secrets::SecretStore;
-use tower_http::{services::{ServeFile, ServeDir}, cors::{Any, CorsLayer}};
+use tower_http::{services::{ServeFile, ServeDir}, cors::{CorsLayer, Any}};
 mod user;
 mod common;
 mod msg;

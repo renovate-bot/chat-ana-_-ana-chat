@@ -7,10 +7,21 @@ import { useRouter } from 'next/router'
 
 const inter = Inter({ subsets: ['latin'] })
 
+function backend_string(endpoint) {
+  let uri = new URL(`http://${window.location.hostname}`);
+  if (window.location.hostname == "localhost" || window.location.hostname == "127.0.0.1") {
+    uri.port = "8000"
+  } else {
+    uri.protocol = "https"
+  }
+  uri = uri.toString()
+  return `${uri}${endpoint}`
+}
+
 export default function Home() {
   const [dom_v, dom_s] = useState(false);
   const [members_v, members_s] = useState(false);
-  const {id} =  useRouter().query;
+  const {id} = useRouter().query;
   const [msg_v, msg_s] = useState([])
   const [msg_arr, msg_arr_s] = useState([])
   let message = useRef(null);
@@ -24,7 +35,7 @@ export default function Home() {
   
       if (new Date().getTime() % 4){
         // server info
-        fetch("http://127.0.0.1:8000/server/info", {
+        fetch(backend_string("server/info"), {
           headers: {
             "name": id
           }
@@ -43,7 +54,7 @@ export default function Home() {
     e?.preventDefault();
 
     if (message.current?.value){
-      fetch("http://127.0.0.1:8000/chat/send", {
+      fetch(backnd_string("chat/info"), {
         method: "POST",
         headers: {
           "sender": "524",
@@ -178,7 +189,7 @@ function Msg(props){
 // }
 
 async function chatid(id) {
-  const a = await fetch("http://127.0.0.1:8000/chat/info", {
+  const a = await fetch(backend_string("chat/info"), {
     method: "GET",
     headers: {
       "chatid": id
