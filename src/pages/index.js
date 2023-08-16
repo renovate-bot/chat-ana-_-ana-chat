@@ -24,11 +24,15 @@ export default function Home() {
   
       if (new Date().getTime() % 4){
         // server info
-        let a = await fetch("http://127.0.0.1:8000/server/info", {
+        fetch("http://127.0.0.1:8000/server/info", {
           headers: {
-            "name": "id"
+            "name": id
           }
-        }).json()
+        }).then(e => { e.json().then(e => {
+          msg_s(e.message.map( async e => chatid(e) ))
+          console.log(e.message.map( async e => chatid(e) ))
+        })
+      })
     }
   }
     f()
