@@ -101,6 +101,7 @@ hr{
 main{
     display: flex;
     flex-direction: column-reverse;
+    overflow-y: scroll;
     gap: 20px;  
     color: var(--reverse);
     padding-left: 5%;

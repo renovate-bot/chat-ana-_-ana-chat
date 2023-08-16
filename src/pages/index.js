@@ -6,47 +6,45 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 const inter = Inter({ subsets: ['latin'] })
-
-function backend_string(endpoint) {
-  let uri = new URL(`http://${window.location.hostname}`);
-  if (window.location.hostname == "localhost" || window.location.hostname == "127.0.0.1") {
-    uri.port = "8000"
-  } else {
-    uri.protocol = "https"
-  }
-  uri = uri.toString()
-  return `${uri}${endpoint}`
-}
-
 export default function Home() {
+  // open = false
   const [dom_v, dom_s] = useState(false);
   const [members_v, members_s] = useState(false);
-  const {id} = useRouter().query;
+  const {id} =  useRouter().query;
   const [msg_v, msg_s] = useState([])
-  const [msg_arr, msg_arr_s] = useState([])
   let message = useRef(null);
-
+  let arr = useRef([]);
+  let cnt = 0;
   useEffect( () => {
+    
+    document.addEventListener("mousemove", (e) => {
+      dom_s(e.clientX <= 15)
+      members_s(window.innerWidth - e.clientX <= 10)
+    })
     let f = async () => {
-      document.addEventListener("mousemove", (e) => {
-        dom_s(e.clientX <= 15)
-        members_s(window.innerWidth - e.clientX <= 10)
-      })
-  
-      if (new Date().getTime() % 4){
+      cnt += 1;
+      if (cnt%80 == 0){
+        console.log(cnt)
         // server info
-        fetch(backend_string("server/info"), {
+        fetch("http://127.0.0.1:8000/server/info", {
           headers: {
             "name": id
           }
         }).then(e => { e.json().then(e => {
-          msg_s(e.message.map( async e => chatid(e) ))
-          console.log(e.message.map( async e => chatid(e) ))
-        })
-      })
+          if (msg_v.length > arr.current.length){
+            arr.current = []
+          }
+          console.log(e.message.map( async e => {arr.current.push(await chatid(e)); return await chatid(e)} ), msg_s(arr.current), msg_v)
+        })})
+        
+      }
+      requestAnimationFrame(f)
     }
-  }
-    f()
+    window.onload = f
+  // if (!open){
+  //   open = true
+  // }
+
     
     })
       
@@ -54,14 +52,14 @@ export default function Home() {
     e?.preventDefault();
 
     if (message.current?.value){
-      fetch(backend_string("chat/info"), {
+      fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
           "sender": "524",
           "content": encodeURI(message.current.value),
           "servername": "a"
         }
-      }).then(e => { /*console.log(e)*/ })
+      }).then(e => { console.log(e) })
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -116,11 +114,15 @@ export default function Home() {
       </nav>
 
       <main>
-        {/* 
-        msg_v.map( (e) => 
-        {console.log( chatid(msg_v[1]))}
-        )
-         */}
+        {
+          msg_v.map( e => 
+            {
+              console.log(e)
+              return <Msg name="a" msg={e.content}/>
+            }
+          )
+        }
+        
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -157,7 +159,7 @@ function ServerBtn(props){
 function UserInfo(props){
   return (
     <a className={`userInfo`}>
-      <img src={`/user/${props.id}.png`}/> <b>{props.name}</b>
+      <img src={`/user/${props.id}.png`}/> <b>{decodeURI(props.name)}</b>
       <span></span>
     </a>
   )
@@ -166,7 +168,7 @@ function UserInfo(props){
 function Msg(props){
   return (
     <section>
-      <b>{props.name}</b>: {props.msg}</section>
+      <b>{props.name}</b>: {decodeURI(props.msg)}</section>
   )
 }
 // function chatid(id) {
@@ -189,7 +191,7 @@ function Msg(props){
 // }
 
 async function chatid(id) {
-  const a = await fetch(backend_string("chat/info"), {
+  const a = await fetch("http://127.0.0.1:8000/chat/info", {
     method: "GET",
     headers: {
       "chatid": id
