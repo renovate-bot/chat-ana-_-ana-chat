@@ -12,26 +12,28 @@ export default function Home() {
   const [members_v, members_s] = useState(false);
   const {id} =  useRouter().query;
   const [msg_v, msg_s] = useState([])
+  const [msg_arr, msg_arr_s] = useState([])
   let message = useRef(null);
+
   useEffect( () => {
-    document.addEventListener("mousemove", (e) => {
-      dom_s(e.clientX <= 15)
-      members_s(window.innerWidth - e.clientX <= 10)
-    })
-
-    if (new Date().getTime() % 4){
-      // server info
-      fetch("http://127.0.0.1:8000/server/info", {
-        headers: {
-          "name": id
-        }
-      }).then( e => { e.json().then(e => {
-        // console.log(e.message)
-        msg_s(e.message)
-
+    let f = async () => {
+      document.addEventListener("mousemove", (e) => {
+        dom_s(e.clientX <= 15)
+        members_s(window.innerWidth - e.clientX <= 10)
       })
+  
+      if (new Date().getTime() % 4){
+        // server info
+        let a = await fetch("http://127.0.0.1:8000/server/info", {
+          headers: {
+            "name": "id"
+          }
+        }).json()
+    }
+  }
+    f()
+    
     })
-  }})
       
   const sendMessage = (e) => {
     e?.preventDefault();
@@ -44,7 +46,7 @@ export default function Home() {
           "content": encodeURI(message.current.value),
           "servername": "a"
         }
-      }).then(e => { console.log(e) })
+      }).then(e => { /*console.log(e)*/ })
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -99,12 +101,11 @@ export default function Home() {
       </nav>
 
       <main>
-        {
-        msg_v.map( async (e) => 
-        {console.log(await chatid(msg_v[0]))}
-          // <p></p>
+        {/* 
+        msg_v.map( (e) => 
+        {console.log( chatid(msg_v[1]))}
         )
-        }
+         */}
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -153,6 +154,25 @@ function Msg(props){
       <b>{props.name}</b>: {props.msg}</section>
   )
 }
+// function chatid(id) {
+//   var a = {
+//   content: null,
+//   date: null,
+//   sender: null
+//   }
+//   fetch("http://127.0.0.1:8000/chat/info", {
+//     method: "GET",
+//     headers: {
+//       "chatid": id
+//     }
+//   }).then(e => e.json().then(e => {
+//     a.content = e.content
+//     a.date = e.date
+//     a.sender = e.sender
+//   }))
+//   return a
+// }
+
 async function chatid(id) {
   const a = await fetch("http://127.0.0.1:8000/chat/info", {
     method: "GET",
