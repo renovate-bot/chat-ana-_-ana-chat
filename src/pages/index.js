@@ -54,7 +54,7 @@ export default function Home() {
     e?.preventDefault();
 
     if (message.current?.value){
-      fetch(backnd_string("chat/info"), {
+      fetch(backend_string("chat/info"), {
         method: "POST",
         headers: {
           "sender": "524",
