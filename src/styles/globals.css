@@ -112,6 +112,21 @@ main{
     /* background-color: red; */
 }
 
+section.new{
+    animation-name: messageLoader;
+    animation-duration: .5s;
+}
+
+@keyframes messageLoader {
+    0%{
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    100%{
+        opacity: 100%;
+        transform: scaleY(1);
+    }
+}
 #messageSender{
     bottom: 10px;
     position: absolute;
@@ -133,6 +148,7 @@ main{
             outline: 0;
         }
     }
+    
     > img{
         border-radius: calc(var(--border-radius)/2);
 

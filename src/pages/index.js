@@ -16,7 +16,6 @@ export default function Home() {
   const {id} =  useRouter().query;
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
-  let arr = useRef([]);
   useEffect( () => {
     
     document.addEventListener("mousemove", (e) => {
@@ -25,18 +24,24 @@ export default function Home() {
     })
     let f = async () => {
       if (cnt % 80 == 0){
-        // console.log(id)
-        // server info
         fetch("http://127.0.0.1:8000/server/info", {
           headers: {
             "name": "a"
           }
         }).then(e => { e.json().then(e => {
-          if (cnt % 160 == 0){
-            arr.current = []
-          }
-          console.log(e)
-          console.log(e.message.map( async e => {arr.current.push(await chatid(e)); return await chatid(e)} ), msg_s(arr.current), msg_v)
+          // console.log(e)
+          e.message.reverse()
+          e.message.map( async id => {
+            setTimeout(async() => {
+              if (!document.getElementById(`msg-${id}`)){
+                let msg = await chatid(id);
+                let a = Msg(msg, id)
+                document.querySelector("main").innerHTML = `${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}${a}`
+                console.log(a)
+              }
+            }, 500)
+            return e
+          })
         })})
         
       }
@@ -66,7 +71,10 @@ export default function Home() {
           "content": encodeURI(message.current.value),
           "servername": "a"
         }
-      }).then(e => { console.log(e) })
+      }).then(e => e.json().then(async msg => {
+        let a = Msg(msg)
+        document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
+      }))
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -121,15 +129,6 @@ export default function Home() {
       </nav>
 
       <main>
-        {
-          msg_v.map( e => 
-            {
-              console.log(e)
-              return <Msg name="a" msg={e.content}/>
-            }
-          )
-        }
-        
       </main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
@@ -172,11 +171,12 @@ function UserInfo(props){
   )
 }
 
-function Msg(props){
-  return (
-    <section>
-      <b>{props.name}</b>: {decodeURI(props.msg)}</section>
-  )
+function Msg(msg, id){
+  if (id){
+    return `<section class="new" id="msg-${msg._id.$oid}"> <b>${msg.sender}</b>: ${decodeURI(msg.content)}</section>`
+  }
+  return `<section class="new" id="msg-${id}"> <b>${msg.sender}</b>: ${decodeURI(msg.content)}</section>`
+
 }
 // function chatid(id) {
 //   var a = {
