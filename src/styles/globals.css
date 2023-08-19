@@ -114,7 +114,7 @@ main{
 
 section.new{
     animation-name: messageLoader;
-    animation-duration: .5s;
+    animation-duration: .1s;
 }
 
 @keyframes messageLoader {

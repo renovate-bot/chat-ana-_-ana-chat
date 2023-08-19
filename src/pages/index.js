@@ -32,14 +32,12 @@ export default function Home() {
           // console.log(e)
           e.message.reverse()
           e.message.map( async id => {
-            setTimeout(async() => {
               if (!document.getElementById(`msg-${id}`)){
                 let msg = await chatid(id);
                 let a = Msg(msg, id)
                 document.querySelector("main").innerHTML = `${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}${a}`
                 console.log(a)
               }
-            }, 500)
             return e
           })
         })})
