@@ -6,7 +6,8 @@ import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 let cnt = 0;
-console.log("started")
+let before = 0
+console.log("started", before)
 
 const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
@@ -34,9 +35,18 @@ export default function Home() {
           e.message.map( async id => {
               if (!document.getElementById(`msg-${id}`)){
                 let msg = await chatid(id);
+                let after = Number(new Date(msg.date));
                 let a = Msg(msg, id)
-                document.querySelector("main").innerHTML = `${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}${a}`
-                console.log(a)
+
+                console.log(before, after)
+                if (before < after && (before || after)){
+                  document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
+                  before = Number(new Date(msg.date));
+                }
+                else{
+                  document.querySelector("main").innerHTML = `${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}${a}`
+                }
+                
               }
             return e
           })
@@ -48,6 +58,7 @@ export default function Home() {
     }
     if (cnt == 0) {
       cnt++
+
       console.log("ok")
       f()
     }
@@ -70,8 +81,8 @@ export default function Home() {
           "servername": "a"
         }
       }).then(e => e.json().then(async msg => {
-        let a = Msg(msg)
-        document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
+        // let a = Msg(msg)
+        // document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
       }))
 
       // fetch("http://127.0.0.1:8000/user/create", {
