@@ -13,11 +13,16 @@ const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   // open = false
   const [dom_v, dom_s] = useState(false);
+  const [id_v, id_s] = useState(null);
+  const [userName_v, userName_s] = useState(null);
   const [members_v, members_s] = useState(false);
-  const {id} =  useRouter().query;
+  const {id, un} =  useRouter().query;
+
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
   useEffect( () => {
+    id_s(id)
+    userName_s(un)
     
     document.addEventListener("mousemove", (e) => {
       dom_s(e.clientX <= 15)
@@ -32,11 +37,11 @@ export default function Home() {
         }).then(e => { e.json().then(e => {
           // console.log(e)
           e.message.reverse()
-          e.message.map( async id => {
-              if (!document.getElementById(`msg-${id}`)){
-                let msg = await chatid(id);
+          e.message.map( async _id => {
+              if (!document.getElementById(`msg-${_id}`)){
+                let msg = await chatid(_id);
                 let after = Number(new Date(msg.date));
-                let a = Msg(msg, id)
+                let a = Msg(msg, _id)
 
                 console.log(before, after)
                 if (before < after && (before || after)){
@@ -76,9 +81,9 @@ export default function Home() {
       fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
-          "sender": "524",
+          "sender": userName_v,
           "content": encodeURI(message.current.value),
-          "servername": "a"
+          "servername": id_v
         }
       }).then(e => e.json().then(async msg => {
         // let a = Msg(msg)
@@ -95,12 +100,14 @@ export default function Home() {
       // }).then(e => { console.log(e) })
 
 
-      // fetch("http://127.0.0.1:8000/user/info", {
-      //   method: "GET",
-      //   headers: {
-      //     "email": "yhanbyeol6bg@gmail.com",
-      //   }
-      // }).then(e => { console.log(e) })
+      fetch("http://127.0.0.1:8000/user/info", {
+        method: "GET",
+        headers: {
+          "email": "yhanbyeol6bg@gmail.com",
+        }
+      }).then(e => e.json().then(e => {
+        console.log("info", e)
+      }))
 
 
 
@@ -135,6 +142,8 @@ export default function Home() {
         <ServerBtn id="3"/>
         <ServerBtn id="4"/>
         <ServerBtn id="5"/>
+        {userName_v}
+        {id_v}
       </nav>
 
       <main>
