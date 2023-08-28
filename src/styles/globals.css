@@ -101,6 +101,7 @@ hr{
 main{
     display: flex;
     flex-direction: column-reverse;
+    overflow-y: scroll;
     gap: 20px;  
     color: var(--reverse);
     padding-left: 5%;
@@ -111,6 +112,21 @@ main{
     /* background-color: red; */
 }
 
+section.new{
+    animation-name: messageLoader;
+    animation-duration: .1s;
+}
+
+@keyframes messageLoader {
+    0%{
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    100%{
+        opacity: 100%;
+        transform: scaleY(1);
+    }
+}
 #messageSender{
     bottom: 10px;
     position: absolute;
@@ -132,6 +148,7 @@ main{
             outline: 0;
         }
     }
+    
     > img{
         border-radius: calc(var(--border-radius)/2);
 
