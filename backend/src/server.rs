@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::common::{DuplicateChecker, get_header_string};
+use crate::{common::{DuplicateChecker, get_header_string}, user::User};
 use axum::http::{HeaderMap, StatusCode};
 use mongodb::{bson::{doc, oid::ObjectId}, Database};
 use async_trait::async_trait;
@@ -93,9 +93,15 @@ pub async fn join_server(header: HeaderMap) -> Result<String, StatusCode> {
             Some(a) => a,
             None => return Err(StatusCode::NOT_FOUND)
         };
-    if serv.member.get(&name).is_none() {
-        serv.member.insert(name);
-    }
+    let mut member = match db.collection::<User>("users")
+        .find_one( doc! {
+            "name": &name
+        }, None).await.unwrap() {
+            Some(a) => a,
+            None => return Err(StatusCode::NOT_FOUND)
+        };
+    serv.member.insert(member.name.clone());
+    member.servers.push(serv.name.clone());
     db.collection::<Server>("servers")
         .update_one(doc! {
             "name": servname
@@ -106,6 +112,16 @@ pub async fn join_server(header: HeaderMap) -> Result<String, StatusCode> {
         }, None)
         .await
         .unwrap();
+    db.collection::<User>("users")
+    .update_one(doc! {
+        "name": member.name
+    }, doc! {
+        "$set": {
+            "servers": member.servers.clone().into_iter().collect::<Vec<String>>()
+        }
+    }, None)
+    .await
+    .unwrap();
     Ok(serde_json::to_string(&serv).unwrap())
 }
 

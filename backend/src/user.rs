@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use axum::http::{HeaderMap, StatusCode};
-use mongodb::{bson::doc, Database};
+use mongodb::{bson::{doc, oid::ObjectId}, Database};
 use crate::common::{DuplicateChecker, get_header_string};
 use serde::{Deserialize, Serialize};
 
@@ -14,11 +14,12 @@ pub enum Status {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct User {
-    name: String,
+    pub name: String,
     email: String,
     profile_image: String,
     status: Status,
-    friends: Vec<User>
+    friends: Vec<String>,
+    pub servers: Vec<String>
 }
 
 #[async_trait]
@@ -46,13 +47,14 @@ impl DuplicateChecker for User {
 }
 
 impl User {
-    fn new(name: String, email: String, profile_image: String, friends: Option<Vec<User>>) -> Self {
+    fn new(name: String, email: String, profile_image: String, friends: Option<Vec<String>>, servers: Option<Vec<String>>) -> Self {
         Self {
             name,
             email,
             profile_image,
             status: Status::Online,
-            friends: friends.unwrap_or_default()
+            friends: friends.unwrap_or_default(),
+            servers: servers.unwrap_or_default()
         }
     }
 }
@@ -69,7 +71,7 @@ impl UserEndpoint {
     }
 
     pub async fn login(&self, name: String, email: String, profile_image: String) -> Result<User, StatusCode> {
-        let user = User::new(name, email, profile_image, None);
+        let user = User::new(name, email, profile_image, None, None);
         if !user.is_duplicate(&self.db).await? {
             match self.db.collection::<User>("users")
                 .insert_one(user.clone(), None)
