@@ -39,12 +39,13 @@ div#main{
     overflow: hidden;
 }
 nav{
+    --gap: 15px;
     position: absolute;
     display: flex;
     align-items: center;
     flex-direction: column;
     padding: 10px;
-    gap: 15px;
+    gap: var(--gap);
     width: 85px;
     border-radius: var(--border-radius);
     margin: 10px;
@@ -57,6 +58,13 @@ nav{
         transform: translateX(0px);
     }
     z-index: 1000;
+}
+
+
+#servers{
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
 }
 
 a.serverBtn{

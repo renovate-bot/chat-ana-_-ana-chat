@@ -14,6 +14,7 @@ console.log("started", before)
 const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   // open = false
+  const [message_v, message_s] = useState(null);
   const [dom_v, dom_s] = useState(false);
   const [id_v, id_s] = useState(null);
   const [userName_v, userName_s] = useState(null);
@@ -22,11 +23,11 @@ export default function Home() {
   
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
-  const searchParams = useSearchParams()
-  const idd = searchParams.get('id')
+  // const searchParams = useSearchParams()
+  // const idd = searchParams.get('id')
   
   useEffect( () => {
-
+    members_s("")
     // let urlParams = new URLSearchParams(window.location.search);
     // _id = urlParams.get('id');
     id_s(id)
@@ -36,64 +37,58 @@ export default function Home() {
       dom_s(e.clientX <= 15)
       members_s(window.innerWidth - e.clientX <= 10)
     })
-    let f = async (idd) => {
-      if (cnt % 80 == 0){
-        // console.log("eeeee", window.location.search.match(/id\=(.*)\&/gim))
-        console.log("function > idd", idd)
-        fetch("http://127.0.0.1:8000/server/info", {
-          headers: {
-            "name": idd
-          }
-        }).then(e => { e.json().then(e => {
-          document.querySelector("main").innerHTML = e.html;
-        }).catch(x => {
-          document.querySelector("main").innerHTML = "<h1>ERROR</h1>";
-        })}).catch(x => {
-          document.querySelector("main").innerHTML = "<h1>ERROR</h1>";
-        })
-        
+    let f = async () => {
+      if (cnt % 15 == 0 || cnt < 10){
+        messageReload(null, message_s, window)
       }
-      cnt++
       requestAnimationFrame(f)
+      cnt++
     }
-    console.log("cnt: ", cnt)
-    console.log("idd: ", idd)
-    console.log("cnt == 0 & idd: ", cnt == 0 & idd != 0)
-    if (cnt == 0 & idd != 0) {
+    // console.log("cnt: ", cnt)
+    // console.log("idd: ", idd)
+    // console.log("cnt == 0 & idd: ", cnt == 0 & idd != 0)
+    if (cnt == 0) {
+      fetch("http://127.0.0.1:8000/user/info", {
+        method: "GET",
+        headers: {
+          "name": "a",
+        }
+      }).then(e => e.json().then(e => {
+        for (let sv in e.servers) {
+          console.log("server id", decodeURI(sv))
+          document.getElementById("servers").innerHTML += `<a href="?id=${sv}&un=${e.name}" class="serverBtn"> <img src=/server/server.svg"/> </a>`
+        }
+        console.log("info", e)
+      }))
       cnt++
 
       console.log("ok")
-      f(idd)
+      f()
     }
   // if (!open){
   //   open = true
   // }
 
     
-    }, [idd])
+    }, [])
       
   const sendMessage = (e) => {
     e?.preventDefault();
+
 
     if (message.current?.value){
       fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
-          "sender": userName_v,
+          "sender": userName,
           "content": encodeURI(message.current.value),
-          "servername": id_v
+          "servername": id
         }
       }).then(e => e.json().then(async msg => {
-        // let a = Msg(msg)
-        // document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
+        
+        messageReload(null, message_s, window)
+        
       }))
-      fetch("http://127.0.0.1:8000/server/info", {
-          headers: {
-            "name": id_v
-          }
-        }).then(e => { e.json().then(e => {
-          document.querySelector("main").innerHTML = e.html;
-        })})
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -104,15 +99,6 @@ export default function Home() {
       //   }
       // }).then(e => { console.log(e) })
 
-
-      fetch("http://127.0.0.1:8000/user/info", {
-        method: "GET",
-        headers: {
-          "name": "a",
-        }
-      }).then(e => e.json().then(e => {
-        console.log("info", e)
-      }))
 
 
 
@@ -142,17 +128,19 @@ export default function Home() {
         <ServerBtn id="logo" select={true}/>
         
         <hr/>
-        <ServerBtn id="1"/>
-        <ServerBtn id="2"/>
-        <ServerBtn id="3"/>
-        <ServerBtn id="4"/>
-        <ServerBtn id="5"/>
+        <div id="servers">
+          
+          {/* <ServerBtn id="a"/>
+          <ServerBtn id="b"/>
+          <ServerBtn id="c"/>
+          <ServerBtn id="d"/>
+          <ServerBtn id="e"/> */}
+        </div>
         {userName_v}
         {id_v}
       </nav>
 
-      <main>
-      </main>
+      <main dangerouslySetInnerHTML={{__html: message_v}}></main>
         
       <form id='messageSender' onSubmit={e => { sendMessage(e) }}>
           <input type="text" ref={message} placeholder='메세지를 입력해주세요' />
@@ -161,34 +149,48 @@ export default function Home() {
 
       <aside className={String(members_v)}>
         <UserInfo id='1' name="eaaaaaaaaaaaaaaaa" url="/server/ea.png"/>
-        <UserInfo id='1' name="eee" url="ea"/>
-        <UserInfo id='1' name="s" url="ea"/>
-        <UserInfo id='1' name="ddf" url="ea"/>
-        <UserInfo id='1' name="5-23" url="ea"/>
+        <UserInfo id='2' name="eee" url="ea"/>
+        <UserInfo id='3' name="s" url="ea"/>
+        <UserInfo id='4' name="ddf" url="ea"/>
+        <UserInfo id='5' name="5-23" url="ea"/>
       </aside>
     </div>
   )
 }
-
+/**
+ * 
+ * @param {{
+ *  id: string 
+ *  select: boolean 
+ * }} props 
+ */
 function ServerBtn(props){
+  const {id, un} =  useRouter().query;
   if (props.id == "logo") {
     return (
-      <Link href={`?id=${props.id}`} className={`serverBtn ${props.select}`}>
+      <Link href={`?id=${props.id}&un=${un}`} className={`serverBtn ${props.select}`}>
         <img src={`/logo.svg`}/>
       </Link>
     )
   }
   return (
-    <Link href={`?id=${props.id}`} className={`serverBtn ${props.select}`}>
+    <Link href={`?id=${props.id}&un=${un}`} className={`serverBtn ${props.select}`}>
       <img src={`/server/server.svg`}/>
     </Link>
   )
 }
-
+/**
+ * 
+ * @param {{
+ *  id: string,
+ *  name: string,
+ *  url: string
+ * }} props 
+ */
 function UserInfo(props){
   return (
     <a className={`userInfo`}>
-      <img src={`/user/${props.id}.png`}/> <b>{decodeURI(props.name)}</b>
+      <img src={`/user/1.png`}/> <b>{decodeURI(props.name)}</b>
       <span></span>
     </a>
   )
@@ -221,4 +223,28 @@ async function chatid(id) {
     }
   })
   return await a.json()
+}
+
+/**
+ * 
+ * @param {string} id 
+ * @param {import('react').Dispatch<import('react').SetStateAction<string>>} messages 
+ * @param {Window} window 
+ */
+function messageReload(id, messages, window) {
+  if (!id){
+    let regex = (/id=(.*)&un=(.*)/gim).exec(window.location.search);
+    id = regex[1]
+  }
+  fetch("http://127.0.0.1:8000/server/info", {
+    headers: {
+      "name": id
+    }
+  }).then(e => { e.json().then(e => {
+    messages(e.html);
+  }).catch(x => {
+    messages("<h1>ERROR</h1>");
+  })}).catch(x => {
+    messages("<h1>ERROR</h1>");
+  })
 }

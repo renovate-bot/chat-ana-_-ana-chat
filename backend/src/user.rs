@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use axum::http::{HeaderMap, StatusCode};
 use mongodb::{bson::doc, Database};
-use crate::common::{DuplicateChecker, get_header_string};
+use crate::{common::{DuplicateChecker, get_header_string}, server};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -45,16 +45,16 @@ impl DuplicateChecker for User {
         }
     }
 }
-
 impl User {
     fn new(name: String, email: String, profile_image: String, friends: Option<Vec<String>>, servers: Option<Vec<String>>) -> Self {
+        let servers = servers.unwrap_or_default();
         Self {
             name,
             email,
             profile_image,
             status: Status::Online,
             friends: friends.unwrap_or_default(),
-            servers: servers.unwrap_or_default()
+            servers
         }
     }
 }
@@ -103,7 +103,7 @@ pub async fn get_user_info(header: HeaderMap) -> Result<String, StatusCode> {
     let name = get_header_string(&header, "name")?;
     let db = crate::common::get_db().await;
     let collec = db.collection::<User>("users");
-    let user = collec.find_one(doc! {
+    let user: Option<User> = collec.find_one(doc! {
         "name": name
     }, None).await.unwrap();
     match user {

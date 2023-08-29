@@ -141,7 +141,7 @@ pub async fn join_server(header: HeaderMap) -> Result<String, StatusCode> {
 pub async fn info_server(header: HeaderMap) -> Result<String, StatusCode> {
     let name = get_header_string(&header, "name")?;
     let db = crate::common::get_db().await;
-    let serv = db.collection::<Server>("servers")
+    let serv: Option<Server> = db.collection::<Server>("servers")
         .find_one(doc! {
             "name": name
         }, None)
