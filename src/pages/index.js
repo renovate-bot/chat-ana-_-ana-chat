@@ -48,15 +48,18 @@ export default function Home() {
     // console.log("idd: ", idd)
     // console.log("cnt == 0 & idd: ", cnt == 0 & idd != 0)
     if (cnt == 0) {
+      let regex = (/id=(.*)&un=(.*)/gim).exec(window.location.search);
+      let un = regex[2]
+      console.log("user name", un)
       fetch("http://127.0.0.1:8000/user/info", {
         method: "GET",
         headers: {
-          "name": "a",
+          "name": un,
         }
       }).then(e => e.json().then(e => {
-        for (let sv in e.servers) {
-          console.log("server id", decodeURI(sv))
-          document.getElementById("servers").innerHTML += `<a href="?id=${sv}&un=${e.name}" class="serverBtn"> <img src=/server/server.svg"/> </a>`
+        for (let i in e.servers) {
+          let sv = e.servers[i]
+          document.getElementById("servers").innerHTML += `<a href="?id=${sv}&un=${un}" class="serverBtn"> <img src="/server/server.svg"/> </a>`
         }
         console.log("info", e)
       }))
