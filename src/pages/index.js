@@ -36,36 +36,39 @@ export default function Home() {
       dom_s(e.clientX <= 15)
       members_s(window.innerWidth - e.clientX <= 10)
     })
-    let f = async () => {
+    console.log(idd)
+    let f = async (idd) => {
       if (cnt % 80 == 0){
         // console.log("eeeee", window.location.search.match(/id\=(.*)\&/gim))
         console.log("eeeee", idd)
         fetch("http://127.0.0.1:8000/server/info", {
           headers: {
-            "name": id_v
+            "name": idd
           }
         }).then(e => { e.json().then(e => {
           document.querySelector("main").innerHTML = e.html;
         }).catch(x => {
           document.querySelector("main").innerHTML = "<h1>ERROR</h1>";
-        })})
+        })}).catch(x => {
+          document.querySelector("main").innerHTML = "<h1>ERROR</h1>";
+        })
         
       }
       cnt++
       requestAnimationFrame(f)
     }
-    if (cnt == 0) {
+    if (cnt == 0 & idd) {
       cnt++
 
       console.log("ok")
-      f()
+      f(idd)
     }
   // if (!open){
   //   open = true
   // }
 
     
-    }, [])
+    }, [idd])
       
   const sendMessage = (e) => {
     e?.preventDefault();
