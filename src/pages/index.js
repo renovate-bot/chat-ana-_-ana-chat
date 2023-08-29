@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-const searchParams = useSearchParams()
+import { useSearchParams } from 'next/navigation'
 
 let cnt = 0;
 let before = 0
@@ -22,8 +22,11 @@ export default function Home() {
   
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
+  const searchParams = useSearchParams()
+  const idd = searchParams.get('id')
+  
   useEffect( () => {
-    let idd = searchParams.get('id')
+
     // let urlParams = new URLSearchParams(window.location.search);
     // _id = urlParams.get('id');
     id_s(id)
@@ -62,7 +65,7 @@ export default function Home() {
   // }
 
     
-    })
+    }, [])
       
   const sendMessage = (e) => {
     e?.preventDefault();
