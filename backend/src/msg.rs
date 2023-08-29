@@ -4,12 +4,12 @@ use mongodb::bson::{doc, oid::ObjectId};
 use serde::{Deserialize, Serialize};
 use crate::{server::Server, common::get_header_string};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Chat {
-    _id: ObjectId,
-    sender: String,
-    content: String,
-    date: DateTime<Utc>
+    pub _id: ObjectId,
+    pub sender: String,
+    pub content: String,
+    pub date: DateTime<Utc>
 }
 
 impl Chat {
@@ -19,6 +19,7 @@ impl Chat {
         }
     }
 }
+
 
 pub async fn send_chat(header: HeaderMap) -> Result<String, StatusCode> {
     let sender = get_header_string(&header, "sender")?;

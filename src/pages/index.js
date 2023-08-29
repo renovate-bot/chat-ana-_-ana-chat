@@ -5,6 +5,8 @@ import { Inter } from 'next/font/google'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+const searchParams = useSearchParams()
+
 let cnt = 0;
 let before = 0
 console.log("started", before)
@@ -17,10 +19,13 @@ export default function Home() {
   const [userName_v, userName_s] = useState(null);
   const [members_v, members_s] = useState(false);
   const {id, un} =  useRouter().query;
-
+  
   const [msg_v, msg_s] = useState([])
   let message = useRef(null);
   useEffect( () => {
+    let idd = searchParams.get('id')
+    // let urlParams = new URLSearchParams(window.location.search);
+    // _id = urlParams.get('id');
     id_s(id)
     userName_s(un)
     
@@ -30,31 +35,16 @@ export default function Home() {
     })
     let f = async () => {
       if (cnt % 80 == 0){
+        // console.log("eeeee", window.location.search.match(/id\=(.*)\&/gim))
+        console.log("eeeee", idd)
         fetch("http://127.0.0.1:8000/server/info", {
           headers: {
-            "name": "a"
+            "name": id_v
           }
         }).then(e => { e.json().then(e => {
-          // console.log(e)
-          e.message.reverse()
-          e.message.map( async _id => {
-              if (!document.getElementById(`msg-${_id}`)){
-                let msg = await chatid(_id);
-                let after = Number(new Date(msg.date));
-                let a = Msg(msg, _id)
-
-                console.log(before, after)
-                if (before < after && (before || after)){
-                  document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
-                  before = Number(new Date(msg.date));
-                }
-                else{
-                  document.querySelector("main").innerHTML = `${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}${a}`
-                }
-                
-              }
-            return e
-          })
+          document.querySelector("main").innerHTML = e.html;
+        }).catch(x => {
+          document.querySelector("main").innerHTML = "<h1>ERROR</h1>";
         })})
         
       }
@@ -89,6 +79,13 @@ export default function Home() {
         // let a = Msg(msg)
         // document.querySelector("main").innerHTML = `${a}${document.querySelector("main").innerHTML.replace( "class=\"new\"", "")}`
       }))
+      fetch("http://127.0.0.1:8000/server/info", {
+          headers: {
+            "name": id_v
+          }
+        }).then(e => { e.json().then(e => {
+          document.querySelector("main").innerHTML = e.html;
+        })})
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -175,7 +172,7 @@ function ServerBtn(props){
   }
   return (
     <Link href={`?id=${props.id}`} className={`serverBtn ${props.select}`}>
-      <img src={`/server/${props.id}.png`}/>
+      <img src={`/server/server.svg`}/>
     </Link>
   )
 }
@@ -189,13 +186,6 @@ function UserInfo(props){
   )
 }
 
-function Msg(msg, id){
-  if (id){
-    return `<section class="new" id="msg-${msg._id.$oid}"> <b>${msg.sender}</b>: ${decodeURI(msg.content)}</section>`
-  }
-  return `<section class="new" id="msg-${id}"> <b>${msg.sender}</b>: ${decodeURI(msg.content)}</section>`
-
-}
 // function chatid(id) {
 //   var a = {
 //   content: null,

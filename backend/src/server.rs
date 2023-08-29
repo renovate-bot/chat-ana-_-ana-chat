@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{common::{DuplicateChecker, get_header_string}, user::User};
+use crate::{common::{DuplicateChecker, get_header_string}, user::User, msg::{info_chat, Chat}};
 use axum::http::{HeaderMap, StatusCode};
 use mongodb::{bson::{doc, oid::ObjectId}, Database};
 use async_trait::async_trait;
@@ -27,18 +27,31 @@ impl Server {
 struct ServerForJSON {
     name: String,
     member: Vec<String>,
-    message: Vec<String>
+    message: Vec<String>,
+    html: String
 }
 
 impl ServerForJSON {
-    fn new(serv: Server) -> Self {
-        let mut a = Self {
+    async fn new(serv: Server) -> Self {
+        let mut html = String::new();
+        let mut member = serv.member.into_iter().collect::<Vec<String>>();
+        let mut message = serv.message.into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
+
+        member.sort();
+        message.sort();
+        for i in message.clone().into_iter().rev(){
+            let mut header = HeaderMap::new();
+            header.insert("chatid", i.to_string().parse().unwrap());
+            let j: Chat = serde_json::from_str(&info_chat(header).await.unwrap()).unwrap();
+            html.push_str(&format!("<section id=\"msg-{}\"> <b>{}</b>: {}</section>", j._id, j.sender, j.content));
+        }
+
+        let a = Self {
             name: serv.name,
-            member: serv.member.into_iter().collect::<Vec<String>>(),
-            message: serv.message.into_iter().map(|x| x.to_string()).collect()
+            member,
+            message,
+            html
         };
-        a.member.sort();
-        a.message.sort();
         a
     }
 }
@@ -135,7 +148,7 @@ pub async fn info_server(header: HeaderMap) -> Result<String, StatusCode> {
         .await
         .unwrap();
     match serv {
-        Some(s) => Ok(serde_json::to_string(&ServerForJSON::new(s)).unwrap()),
+        Some(s) => Ok(serde_json::to_string(&ServerForJSON::new(s).await).unwrap()),
         None => Err(StatusCode::NOT_FOUND)
     }
 }
