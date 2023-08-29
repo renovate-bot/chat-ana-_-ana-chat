@@ -100,11 +100,11 @@ pub async fn create_user(header: HeaderMap) -> Result<String, StatusCode> {
 }
 
 pub async fn get_user_info(header: HeaderMap) -> Result<String, StatusCode> {
-    let email = get_header_string(&header, "email")?;
+    let name = get_header_string(&header, "name")?;
     let db = crate::common::get_db().await;
     let collec = db.collection::<User>("users");
     let user = collec.find_one(doc! {
-        "email": email
+        "name": name
     }, None).await.unwrap();
     match user {
         None => Err(StatusCode::NOT_FOUND),

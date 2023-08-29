@@ -103,7 +103,7 @@ export default function Home() {
       fetch("http://127.0.0.1:8000/user/info", {
         method: "GET",
         headers: {
-          "email": "yhanbyeol6bg@gmail.com",
+          "name": "a",
         }
       }).then(e => e.json().then(e => {
         console.log("info", e)
