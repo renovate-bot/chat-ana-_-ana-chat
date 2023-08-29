@@ -36,11 +36,10 @@ export default function Home() {
       dom_s(e.clientX <= 15)
       members_s(window.innerWidth - e.clientX <= 10)
     })
-    console.log(idd)
     let f = async (idd) => {
       if (cnt % 80 == 0){
         // console.log("eeeee", window.location.search.match(/id\=(.*)\&/gim))
-        console.log("eeeee", idd)
+        console.log("function > idd", idd)
         fetch("http://127.0.0.1:8000/server/info", {
           headers: {
             "name": idd
@@ -57,7 +56,10 @@ export default function Home() {
       cnt++
       requestAnimationFrame(f)
     }
-    if (cnt == 0 & idd) {
+    console.log("cnt: ", cnt)
+    console.log("idd: ", idd)
+    console.log("cnt == 0 & idd: ", cnt == 0 & idd != 0)
+    if (cnt == 0 & idd != 0) {
       cnt++
 
       console.log("ok")
