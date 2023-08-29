@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use axum::http::{HeaderMap, StatusCode};
-use mongodb::{bson::{doc, oid::ObjectId}, Database};
+use mongodb::{bson::doc, Database};
 use crate::common::{DuplicateChecker, get_header_string};
 use serde::{Deserialize, Serialize};
 
