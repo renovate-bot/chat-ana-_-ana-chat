@@ -15,6 +15,7 @@ const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   // open = false
   const [message_v, message_s] = useState(null);
+  const [member_v, member_s] = useState(null);
   const [dom_v, dom_s] = useState(false);
   const [id_v, id_s] = useState(null);
   const [userName_v, userName_s] = useState(null);
@@ -38,8 +39,8 @@ export default function Home() {
       members_s(window.innerWidth - e.clientX <= 10)
     })
     let f = async () => {
-      if (cnt % 15 == 0 || cnt < 10){
-        messageReload(null, message_s, window)
+      if (cnt % 60 == 0 || cnt <= 1){
+        messageReload(null, message_s, window, member_s)
       }
       requestAnimationFrame(f)
       cnt++
@@ -49,6 +50,7 @@ export default function Home() {
     // console.log("cnt == 0 & idd: ", cnt == 0 & idd != 0)
     if (cnt == 0) {
       let regex = (/id=(.*)&un=(.*)/gim).exec(window.location.search);
+      let sv = regex[1]
       let un = regex[2]
       console.log("user name", un)
       fetch("http://127.0.0.1:8000/user/info", {
@@ -63,6 +65,7 @@ export default function Home() {
         }
         console.log("info", e)
       }))
+
       cnt++
 
       console.log("ok")
@@ -77,21 +80,18 @@ export default function Home() {
       
   const sendMessage = (e) => {
     e?.preventDefault();
-
+    let regex = (/id=(.*)&un=(.*)/gim).exec(window.location.search);
+    let un = regex[2]
 
     if (message.current?.value){
       fetch("http://127.0.0.1:8000/chat/send", {
         method: "POST",
         headers: {
-          "sender": userName,
+          "sender": un,
           "content": encodeURI(message.current.value),
           "servername": id
         }
-      }).then(e => e.json().then(async msg => {
-        
-        messageReload(null, message_s, window)
-        
-      }))
+      }).then(e => messageReload(null, message_s, window))
 
       // fetch("http://127.0.0.1:8000/user/create", {
       //   method: "POST",
@@ -131,16 +131,7 @@ export default function Home() {
         <ServerBtn id="logo" select={true}/>
         
         <hr/>
-        <div id="servers">
-          
-          {/* <ServerBtn id="a"/>
-          <ServerBtn id="b"/>
-          <ServerBtn id="c"/>
-          <ServerBtn id="d"/>
-          <ServerBtn id="e"/> */}
-        </div>
-        {userName_v}
-        {id_v}
+        <div id="servers"></div>
       </nav>
 
       <main dangerouslySetInnerHTML={{__html: message_v}}></main>
@@ -150,12 +141,12 @@ export default function Home() {
           <img src="/icon/send_w.svg" onClick={() => sendMessage()}/>
       </form>
 
-      <aside className={String(members_v)}>
-        <UserInfo id='1' name="eaaaaaaaaaaaaaaaa" url="/server/ea.png"/>
+      <aside className={String(members_v)} dangerouslySetInnerHTML={{__html: member_v}}>
+        {/* <UserInfo id='1' name="eaaaaaaaaaaaaaaaa" url="/server/ea.png"/>
         <UserInfo id='2' name="eee" url="ea"/>
         <UserInfo id='3' name="s" url="ea"/>
         <UserInfo id='4' name="ddf" url="ea"/>
-        <UserInfo id='5' name="5-23" url="ea"/>
+        <UserInfo id='5' name="5-23" url="ea"/> */}
       </aside>
     </div>
   )
@@ -234,7 +225,8 @@ async function chatid(id) {
  * @param {import('react').Dispatch<import('react').SetStateAction<string>>} messages 
  * @param {Window} window 
  */
-function messageReload(id, messages, window) {
+function messageReload(id, messages, window, member) {
+  console.log("req reload");
   if (!id){
     let regex = (/id=(.*)&un=(.*)/gim).exec(window.location.search);
     id = regex[1]
@@ -244,7 +236,14 @@ function messageReload(id, messages, window) {
       "name": id
     }
   }).then(e => { e.json().then(e => {
+    console.log("reload!")
     messages(e.html);
+    
+    if (member != null && member != undefined){
+      member(e.member_html);
+      console.log(e.member_html)
+    }
+
   }).catch(x => {
     messages("<h1>ERROR</h1>");
   })}).catch(x => {

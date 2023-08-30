@@ -28,12 +28,14 @@ struct ServerForJSON {
     name: String,
     member: Vec<String>,
     message: Vec<String>,
-    html: String
+    html: String,
+    member_html: String,
 }
 
 impl ServerForJSON {
     async fn new(serv: Server) -> Self {
         let mut html = String::new();
+        let mut member_html = String::new();
         let mut member = serv.member.into_iter().collect::<Vec<String>>();
         let mut message = serv.message.into_iter().map(|x| x.to_string()).collect::<Vec<String>>();
 
@@ -46,11 +48,19 @@ impl ServerForJSON {
             html.push_str(&format!("<section id=\"msg-{}\"> <b>{}</b>: {}</section>", j._id, j.sender, j.content));
         }
 
+
+        for name in &member{
+            member_html.push_str(&format!("<a class=\"userInfo\"> <img src=\"/user/1.png\"/> <b>{name}</b> <span></span> </a>"),);
+        }
+        // println!("{html:?}");
+
+
         let a = Self {
             name: serv.name,
             member,
             message,
-            html
+            html,
+            member_html
         };
         a
     }
