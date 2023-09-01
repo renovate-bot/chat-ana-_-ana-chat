@@ -1,4 +1,4 @@
-use axum::http::{HeaderMap, StatusCode};
+use axum::{http::{HeaderMap, StatusCode}, response::IntoResponse};
 use async_trait::async_trait;
 use mongodb::{Database, options::{ClientOptions, ServerApi, ServerApiVersion}, Client};
 use std::env::var;
@@ -6,6 +6,10 @@ use std::env::var;
 #[async_trait]
 pub trait DuplicateChecker: Send {
     async fn is_duplicate(&self, db: &Database) -> Result<bool, StatusCode>;
+}
+
+pub fn ok(_: HeaderMap) -> impl IntoResponse {
+    (StatusCode::OK, "OK")
 }
 
 pub fn get_header_string(header: &HeaderMap, name: &str) -> Result<String, StatusCode>{

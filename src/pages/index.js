@@ -57,6 +57,7 @@ export default function Home() {
         method: "GET",
         headers: {
           "name": un,
+          "Access-Control-Request-Method": ["GET", "OPTIONS"],
         }
       }).then(e => e.json().then(e => {
         for (let i in e.servers) {
@@ -232,7 +233,9 @@ function messageReload(id, messages, window, member) {
     id = regex[1]
   }
   fetch("http://127.0.0.1:8000/server/info", {
+    method: "GET",
     headers: {
+      "Access-Control-Request-Method": ["GET", "OPTIONS"],
       "name": id
     }
   }).then(e => { e.json().then(e => {
