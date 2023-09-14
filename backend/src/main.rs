@@ -1,14 +1,10 @@
-use std::{env::set_var, path::PathBuf, str::FromStr};
+use std::{env::set_var, path::PathBuf};
 
 use axum::{
-    http::{
-        header::{ACCEPT, AUTHORIZATION, ORIGIN},
-        HeaderName, Method
-    },
+    http::Method,
     routing::{get, post},
     Router,
 };
-use common::ok;
 use shuttle_secrets::SecretStore;
 use tower_http::{
     cors::{Any, CorsLayer},

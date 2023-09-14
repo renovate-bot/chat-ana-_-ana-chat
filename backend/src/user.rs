@@ -95,7 +95,7 @@ pub async fn create_user(header: HeaderMap) -> Result<String, StatusCode> {
     let profile_image = get_header_string(&header, "profile_image")?;
     let db = crate::common::get_db().await;
     let userendpoint = UserEndpoint::new(db);
-    let user = userendpoint.login(name, email, profile_image).await.unwrap();
+    let user = userendpoint.login(name, email, profile_image).await?;
     Ok(serde_json::to_string(&user).unwrap())
 }
 
